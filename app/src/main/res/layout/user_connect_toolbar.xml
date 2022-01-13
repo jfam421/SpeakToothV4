@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#115ede"
+    android:elevation="4dp"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <View
+            android:id="@+id/left_icon"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="7dp"
+            android:background="#F65819" />
+
+        <TextView
+            android:id="@+id/icon_letter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="17dp"
+            android:maxLength="1"
+            android:text="U"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/icon_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="7dp"
+            android:layout_toEndOf="@+id/left_icon"
+            android:maxLength="16"
+            android:text="User"
+            android:textColor="#fff"
+            android:textSize="19dp" />
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/icon_name"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/left_icon"
+            android:maxLength="16"
+            android:text="Disconnected"
+            android:textColor="#fff"
+            android:textSize="14dp" />
+
+        <ImageView
+            android:id="@+id/status"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="34dp"
+            android:layout_toEndOf="@+id/status_text"
+            android:background="@drawable/ic_disconnected"
+            android:textColor="#fff"
+            android:textSize="19dp" />
+
+        <ImageButton
+            android:id="@+id/connectBtn"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="10dp"
+            android:background="#0000"
+            android:src="@drawable/vertical_spots" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

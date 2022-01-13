@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#115ede"
+    android:elevation="4dp"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <View
+            android:id="@+id/left_icon_main"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="7dp"
+            android:background="#FA5103" />
+
+        <TextView
+            android:id="@+id/icon_letter_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="17dp"
+            android:maxLength="1"
+            android:text="U"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/icon_name_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="7dp"
+            android:layout_toEndOf="@+id/left_icon_main"
+            android:text="User"
+            android:textColor="#fff"
+            android:textSize="19dp" />
+
+
+        <TextView
+            android:id="@+id/status_text_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/icon_name_main"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/left_icon_main"
+            android:text="Status: online"
+            android:textColor="#fff"
+            android:textSize="14dp" />
+
+        <ImageButton
+            android:id="@+id/change_settings_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_settings" />
+
+        <ImageButton
+            android:id="@+id/icon_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="19dp"
+            android:layout_marginEnd="55dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toStartOf="@+id/change_settings_main"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_share_24" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>
