@@ -1,10 +1,15 @@
 package com.example.speaktoothv4;
+//The class for custom listview of paired devices
 
 public class DeviceItem {
-   String name;
-   int color;
-   String mac;
+    //The name of the device
+    public String name;
+    //The color of his icon
+    public int color;
+    //The mac of the device
+    public String mac;
 
+    //Create object of the class device item
     public DeviceItem(String name, int color, String mac) {
         this.name = name;
         this.color = color;
@@ -13,10 +18,6 @@ public class DeviceItem {
 
     public String getMac() {
         return mac;
-    }
-
-    public void setMac(String mac) {
-        this.mac = mac;
     }
 
     public String getName() {

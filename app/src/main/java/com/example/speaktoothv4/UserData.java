@@ -1,4 +1,5 @@
 package com.example.speaktoothv4;
+//The class of the user that contains data about him
 
 public class UserData {
     //Name of the saved user and his icon color

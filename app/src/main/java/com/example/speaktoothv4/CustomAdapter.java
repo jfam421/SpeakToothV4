@@ -19,7 +19,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     ArrayList<MessageModel> list;
     public static final int MESSAGE_TYPE_IN = 0;
 
-
+    //Create custom adapter for the messages
     public CustomAdapter(Context context, ArrayList<MessageModel> list) {
         this.context = context;
         this.list = list;
@@ -27,11 +27,10 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
 
     private class MessageInViewHolder extends RecyclerView.ViewHolder {
-
         TextView messageTV;
-
         MessageInViewHolder(final View itemView) {
             super(itemView);
+            //Find view elements of the item by those id
             messageTV = itemView.findViewById(R.id.message_text);
             //On long click listener
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -49,8 +48,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             });
         }
-
-        void bind(int position) {
+        public void bind(int position) {
             MessageModel messageModel = list.get(position);
             messageTV.setText(messageModel.message);
         }

@@ -146,12 +146,14 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 //Creates new intent and moves to another activity
                 Intent mainIntent = new Intent(EditProfile.this, MainActivity.class);
                 EditProfile.this.startActivity(mainIntent);
+                //Animation slide from one activity to another
                 overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
                 break;
             case R.id.go_back:
                 //Creates new intent and moves to another activity
                 mainIntent = new Intent(EditProfile.this, MainActivity.class);
                 EditProfile.this.startActivity(mainIntent);
+                //Animation slide from one activity to another
                 overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
                 break;
 
@@ -180,6 +182,8 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     public void onBackPressed() {
         Intent mainIntent = new Intent(EditProfile.this, MainActivity.class);
         EditProfile.this.startActivity(mainIntent);
+        //Animation slide from one activity to another
         overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
+
     }
 }

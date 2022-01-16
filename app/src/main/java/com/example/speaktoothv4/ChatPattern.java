@@ -55,7 +55,7 @@ import java.util.Date;
 import java.util.UUID;
 
 public class ChatPattern extends AppCompatActivity implements View.OnClickListener {
-    private static final int REQUEST_TAKE_PHOTO = 1;
+
     //Database of the user and messages
     public String TABLE_NAME_2 = "Messages";
     public SQLiteDatabase db, db_2, db_3;
@@ -91,7 +91,8 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
     public EditText editTextMessage;
     public AlertDialog.Builder builder;
     public PopupMenu popup;
-    //Handler states
+    //Handler states and final integers
+    private static final int REQUEST_TAKE_PHOTO = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
     public static final int STATE_CONNECTION_FAILED = 4;
@@ -151,17 +152,22 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
             toast.show();
 
         }
+        //Setup database function
         setupDB();
+        //Make on touch listener to check if right drawable is touched
         editTextMessage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 final int DRAWABLE_RIGHT = 2;
-
+                //Get motion event so that I could check if the right drawable was touched
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     if (event.getRawX() >= (editTextMessage.getRight() - editTextMessage.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        //Check if bluetooth is working and user has connected to another user
                         if (bAdapter.isEnabled() && sendReceive != null) {
+                            //Function to get image
                             selectImage();
-                        }else {
+                        } else {
+                            //Make toast and show it
                             Toast toast = Toast.makeText(ChatPattern.this, "You have to connect to the user", Toast.LENGTH_LONG);
                             toast.show();
                         }
@@ -197,6 +203,7 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
                             closeConnection();
                             Intent ChatIntent = new Intent(ChatPattern.this, MainActivity.class);
                             startActivity(ChatIntent);
+                            //Animation slide from one activity to another
                             overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
                         }
 
@@ -234,7 +241,11 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+    //Select image function
     private void selectImage() {
+        //I make alert dialog box where user can choose what he wants to do
+        //Take picture, choose picture from gallery or cancel and close dialog box
+        //Make dialog box
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(ChatPattern.this);
         builder.setTitle("Add Photo:");
@@ -242,25 +253,30 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (options[item].equals("Take Photo")) {
+                    //Take picture intent
                     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     // Create the File where the photo should go
                     File photoFile = null;
                     try {
+                        //Create image function
                         photoFile = createImageFile();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     // Continue only if the File was successfully created
                     if (photoFile != null) {
+                        //With file provider get file uri and send it to activity for result
                         photoURI = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".provider", photoFile);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
 
                     }
                 } else if (options[item].equals("Choose from Gallery")) {
+                    //Create chooser from the gallery intent
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(intent, 2);
                 } else if (options[item].equals("Cancel")) {
+                    //Close dialog box
                     dialog.dismiss();
                 }
             }
@@ -271,37 +287,43 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //Check if bluetooth is working
         if (bAdapter.isEnabled()) {
             if (requestCode == 1 && resultCode == RESULT_OK) {
+                //If request code to get image that user have made
                 Intent intent = new Intent();
                 intent.setPackage("com.android.bluetooth");
                 intent.setAction(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, photoURI);
                 intent.setType("image/*");
-
+                //Send image with intent by bluetooth
                 startActivity(intent);
             } else if (requestCode == 2 && resultCode == RESULT_OK) {
+                //If request code to get image from the gallery
                 Uri selectedImage = data.getData();
                 Intent intent = new Intent();
                 intent.setPackage("com.android.bluetooth");
                 intent.setAction(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, selectedImage);
                 intent.setType("image/*");
-
+                //Send image with intent by bluetooth
                 startActivity(intent);
             }
 
         } else {
+            //Otherwise if bluetooth is not working it make toast
             Toast toast = Toast.makeText(ChatPattern.this, "You have to turn on Bluetooth", Toast.LENGTH_LONG);
             toast.show();
         }
     }
 
-
+    //Function creates image file
     private File createImageFile() throws IOException {
-        // Create an image file name
+        // Create an empty image file name and return it with name
+        // File name looks like "JPEG_202201161402_"
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
+        //Get storage directory and saves the image file there
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
 
@@ -367,16 +389,23 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
         db = openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
         //Make other object db_2 so that I could work with another table
         db_2 = db;
+        db_3 = db;
         String TABLE_NAME = "Data";
+        TABLE_NAME_3 = "ListUsers";
         String DATABASE_CREATE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(Name VARCHAR, Color INTEGER);";
         db.execSQL(DATABASE_CREATE);
         String DATABASE_CREATE_2 = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME_2 + "(Mac VARCHAR, Sender INTEGER, Text VARCHAR);";
         db_2.execSQL(DATABASE_CREATE_2);
+        String DATABASE_CREATE_3 = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME_3 + "(Name VARCHAR, Color INTEGER, Mac VARCHAR);";
+        db_3.execSQL(DATABASE_CREATE_3);
+
         //Select data from database
         String SELECT = "SELECT Name, Color FROM " + TABLE_NAME;
         String SELECT_2 = "SELECT Mac, Sender, Text FROM " + TABLE_NAME_2;
+        String SELECT_3 = "SELECT Name, Color, Mac FROM " + TABLE_NAME_3;
         Cursor cur = db.rawQuery(SELECT, null);
         Cursor cur_2 = db_2.rawQuery(SELECT_2, null);
+        Cursor cur_3 = db.rawQuery(SELECT_3, null);
 
         if (cur != null) {
             boolean isNotEmpty = cur.moveToFirst();
@@ -412,19 +441,15 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
             recyclerView.setAdapter(messagesAdapter);
             smoothScrollToBottom();
         }
-        db_3 = openOrCreateDatabase("DataUser", MODE_PRIVATE, null);
-        TABLE_NAME_3 = "ListUsers";
-        String DATABASE_CREATE_3 = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME_3 + "(Name VARCHAR, Color INTEGER, Mac VARCHAR);";
-        db_3.execSQL(DATABASE_CREATE_3);
-        String SELECT_3 = "SELECT Name, Color, Mac FROM " + TABLE_NAME_3;
-        Cursor cur_3 = db.rawQuery(SELECT_3, null);
+
+
 
         if (cur_3 != null) {
             boolean isNotEmpty_3 = cur_3.moveToFirst();
             while (isNotEmpty_3) {
                 //If database is not empty - enter all data into view objects
-                if(cur_3.getString(cur_3.getColumnIndex("Mac")).equals(selectedDevice.getAddress())){
-                icon_letter.setText(cur_3.getString(cur_3.getColumnIndex("Name")));
+                if (cur_3.getString(cur_3.getColumnIndex("Mac")).equals(selectedDevice.getAddress())) {
+                    icon_letter.setText(cur_3.getString(cur_3.getColumnIndex("Name")));
                     if (selectedDevice.getName().length() > 12) {
                         //If the name length bigger than 12 so it will right in the end 3 points("...")
                         userConnectedTo.setText(cur_3.getString(cur_3.getColumnIndex("Name")).substring(0, 12) + "...");
@@ -433,7 +458,8 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
                         userConnectedTo.setText(cur_3.getString(cur_3.getColumnIndex("Name")));
                     }
 
-                icon.setBackgroundColor(cur_3.getInt(cur_3.getColumnIndex("Color")));}
+                    icon.setBackgroundColor(cur_3.getInt(cur_3.getColumnIndex("Color")));
+                }
                 //Move to next row in database
                 isNotEmpty_3 = cur_3.moveToNext();
             }
@@ -447,7 +473,6 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.connectBtn:
-
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     //Setup on item click listener for item in popup menu
@@ -466,7 +491,6 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
                                             //Starts new client connect thread
                                             client = new Client(selectedDevice);
                                             client.start();
-
 
 
                                             //Change connection status icon
@@ -602,9 +626,9 @@ public class ChatPattern extends AppCompatActivity implements View.OnClickListen
                     String msgCleared = messageChecker(tempMsg.substring(0, tempMsg.length() - 3));
                     //Get type of the message
                     String type = tempMsg.substring((tempMsg.length() - 3));
-                    //If service is running it will send data to the service
-                    if (notificationService != null && notificationService.serviceIsRunning) {
-                        notificationService.sendNotification(selectedDevice.getName(), msgCleared);
+                    //If service is running it will send data to the service and it does not the info message
+                    if (notificationService != null && notificationService.serviceIsRunning && !type.equals("[0]")) {
+                        notificationService.sendNotification(userConnectedTo.getText().toString(), msgCleared);
                     }
                     //Make switch for type of the message
                     //Log.d(TAG, "handleMessage: " + type);

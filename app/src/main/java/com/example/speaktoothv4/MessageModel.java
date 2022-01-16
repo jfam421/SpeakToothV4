@@ -1,4 +1,5 @@
 package com.example.speaktoothv4;
+//The class that contains info about the message(type and text)
 
 public class MessageModel {
     //Text of the message

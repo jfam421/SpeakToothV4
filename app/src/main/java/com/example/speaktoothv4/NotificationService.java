@@ -42,7 +42,7 @@ public class NotificationService extends Service {
         //Setup notification
         NotificationCompat.Builder builder2 = new NotificationCompat.Builder(this, "Msg")
                 .setSmallIcon(R.drawable.chat1)
-                .setContentTitle("New message from " + name)
+                .setContentTitle("New message from: " + name)
                 .setContentText("Open the application to check it")
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(text))

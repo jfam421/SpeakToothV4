@@ -26,6 +26,7 @@ public class StartScreen extends AppCompatActivity {
             public void run() {
                 Intent mainIntent = new Intent(StartScreen.this, MainActivity.class);
                 StartScreen.this.startActivity(mainIntent);
+                //Animation slide from one activity to another
                 overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
 
             }

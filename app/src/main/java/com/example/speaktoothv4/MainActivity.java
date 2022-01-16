@@ -28,11 +28,6 @@ import androidx.core.content.FileProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -83,15 +78,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         db_2 = openOrCreateDatabase("DataUser", MODE_PRIVATE, null);
         db_2.execSQL(DATABASE_CREATE_2);
+        //Check if the bluetooth is working
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableBtIntent);
         } else {
-
+            //Otherwise it will start function paired devices
             pairedDevices();
         }
-        //Setup adapter for the listview
-
 
         //Setup adapter for the listview
         devices.setAdapter(deviceListAdapter);
@@ -110,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 swiper.setRefreshing(false);
             }
         });
-
+        //Broadcast receiver to check state of bluetooth
         mBroadcastReceiver1 = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -119,8 +113,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                     final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                     if (state == BluetoothAdapter.STATE_OFF) {
+                        //If it`s off - make status offline
                         status_text_main.setText("Status: offline");
                     } else if (state == BluetoothAdapter.STATE_ON) {
+                        //If it`s on - make status online
                         status_text_main.setText("Status: online");
                     }
 
@@ -171,59 +167,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    //Share apk function
     private void shareApplication() {
+        //Get application info and get apk path
         ApplicationInfo app = getApplicationContext().getApplicationInfo();
         String filePath = app.sourceDir;
-
-
+        //Make intent send
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("*/*");
 
-
-        // Append file and send Intent
-        File originalApk = new File(filePath);
-
-        try {
-            //Make new directory in new location
-            File tempFile = new File(getExternalCacheDir() + "/ExtractedApk");
-            //If directory doesn't exists create new
-            if (!tempFile.isDirectory())
-                if (!tempFile.mkdirs())
-                    return;
-            //Get application's name and convert to lowercase
-            tempFile = new File(tempFile.getPath() + "/" + getString(app.labelRes).replace(" ", "").toLowerCase() + ".apk");
-            //If file doesn't exists create new
-            if (!tempFile.exists()) {
-                if (!tempFile.createNewFile()) {
-                    return;
-                }
-            }
-            //Copy file to new location
-            InputStream in = new FileInputStream(originalApk);
-            OutputStream out = new FileOutputStream(tempFile);
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-            Uri uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".provider", tempFile);
-            List<ResolveInfo> resInfoList = this.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                this.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-            //Open share dialog
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.putExtra(Intent.EXTRA_STREAM, uri);
-            startActivity(Intent.createChooser(intent, "Share app via"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        //Make uri with file provider
+        Uri uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".provider", new File(filePath));
+        //Make sure that all permissions was granted for uri apk
+        List<ResolveInfo> resInfoList = this.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        for (ResolveInfo resolveInfo : resInfoList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            this.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
+        //Open share dialog and share the apk
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(intent, "Share app via"));
+
+
     }
 
     @SuppressLint("Range")
@@ -271,31 +238,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Get set of bounded devices and making new adaptor for a listview
             //Iterating
             pairedDevicesToList = bluetoothAdapter.getBondedDevices();
+            //Another array list with devices addresses(MAC)
             ArrayList pairedDevicesToListString = new ArrayList();
-
+            //Check if user has paired devices
             if (pairedDevicesToList.size() > 0) {
+                //Check all devices in the list
                 for (BluetoothDevice device : pairedDevicesToList) {
+                    //User may has paired with different devices(it could be phone, computer or headphone)
+                    //I had checked all devices class and I have found out that device class = 524 it has to be a phone
                     if (device.getBluetoothClass().getDeviceClass() == 524) {
                         pairedDevicesToListString.add(device.getAddress());
+                        //Check if we have this paired device in our database with this address
                         boolean checker = searchDataDb(device.getAddress());
                         if (!checker) {
+                            //If it is false we add it to our database
                             db_2.execSQL("INSERT INTO " + TABLE_NAME_2 + " Values ('" + device.getName() + "' ,'-368128','" + device.getAddress() + "');");
                         }
                     }
                 }
+                //Make adapter to the listview
                 deviceListAdapter = new DeviceListAdapter(MainActivity.this, R.layout.mlist_item, listDevices);
             }
-
+            //Check if we have data in the database of the paired users with there names
             Cursor cur_2 = db_2.rawQuery(SELECT_2, null);
             boolean isNotEmpty_2 = cur_2.moveToFirst();
             while (isNotEmpty_2) {
+                //Add device to list from database
                 listDevices.add(new DeviceItem(cur_2.getString(cur_2.getColumnIndex("Name")), cur_2.getInt(cur_2.getColumnIndex("Color")), cur_2.getString(cur_2.getColumnIndex("Mac"))));
                 //Move to next row in database
                 isNotEmpty_2 = cur_2.moveToNext();
             }
+            //Check if the user had unpaired with some phone from paired devices list
             if (pairedDevicesToListString.size() < listDevices.size()) {
+                //Check all list of devices
                 for (DeviceItem item : listDevices) {
+                    //If the application found out that user does not have this paired device in his list of paired devices
                     if (!pairedDevicesToListString.contains(item.getMac())) {
+                        //Delete it from database
                         db_2.execSQL("DELETE FROM " + TABLE_NAME_2 + " Where Mac = '" + item.getMac() + "'");
                     }
                 }
@@ -303,19 +282,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
+    //Search in database function
     @SuppressLint("Range")
     public boolean searchDataDb(String mac) {
+        //The function checks if user has some special data(MAC) in his database
+        //Result of the searching(boolean variable)
         boolean toReturn = false;
         Cursor cur_2 = db_2.rawQuery(SELECT_2, null);
         boolean isNotEmpty_2 = cur_2.moveToFirst();
         while (isNotEmpty_2) {
+            //It has find this data in the database
             if (cur_2.getString(cur_2.getColumnIndex("Mac")).equals(mac)) {
+                //Data to return is true
                 toReturn = true;
             }
             Log.d(TAG, "searchDataDb: " + mac + "----" + cur_2.getString(cur_2.getColumnIndex("Mac")));
             isNotEmpty_2 = cur_2.moveToNext();
         }
+        //Otherwise it will return false
         return toReturn;
     }
 
@@ -340,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
+        //Unregister broadcast receiver if the application is destroyed
         unregisterReceiver(mBroadcastReceiver1);
         super.onDestroy();
     }
